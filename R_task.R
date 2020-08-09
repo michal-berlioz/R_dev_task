@@ -1,29 +1,35 @@
-modifier <-function(input.data,
+install.packages("tidyverse")
+library(dplyr)
+
+Modifier <-function(input.data,
                     min=0,
                     max=90,
                     step=10,
                     threshold=NULL,
-                    dates_col_name="Date",
-                    cut_points=c(NA,NA),
+                    dates.column.name="Date",
+                    cut.points=c(NA,NA),
                     sep=";",
                     dec=","){
   
-  variantsCount <- (max-min)/step
-  variablesColnames <- colnames(input.data)[-(1:1)]
-  
-  for (v in variantsCount){
-    for (n in variablesColnames){
-      
+  colnames(input.data)[1] <- dates.column.name
+  input.data[[dates.column.name]] <- as.Date(input.data[[dates.column.name]])
+  variants.count <- (max-min)/step + 1
+  variables.colnames <- colnames(input.data)[-(1:1)]
+  output.data <- input.data %>%
+    filter(.[[dates.column.name]] > cut.points[1] & .[[dates.column.name]] < cut.points[2])
+  for (variant in variants.count){
+    s <- 0
+    for (variable in variables.colnames){
+      s <- s + step  
     }
   }
-  return(input.data)
+  return(output.data)
   
 }
 
 
-main_tab <- read.csv2("D:\\R_data\\R_dev_task.csv")
+main.tab <- read.csv2("D:\\R_data\\R_dev_task_project\\R_dev_task\\R_dev_task.csv")
 
-modifier(input.data = main_tab)
-length(colnames(main_tab))
-colnames(main_tab)[-(1:1)]
- 
+c.points <- c("2017-02-01","2017-04-30")
+result <- Modifier(input.data=main.tab, dates.column.name="Datyy",  cut.points=c.points)
+
