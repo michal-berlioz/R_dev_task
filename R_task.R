@@ -12,7 +12,7 @@ Modifier <-function(input.data,
                     sep=";",
                     dec=","){
   
-  #Sprawdzenie braku danych---------------------------------------------------------------------------
+  #Sprawdzenie brakujacych  danych---------------------------------------------------------------------------
   variables.colnames <- colnames(input.data)[-(1:1)]
   input.data[variables.colnames] <- sapply(input.data[variables.colnames], as.numeric)
   if (!identical(which(is.na(input.data)), integer(0))) 
@@ -42,29 +42,27 @@ Modifier <-function(input.data,
   }
   
   #Zamiana niskich wartosci---------------------------------------------------------------------------
-  if (is.na(threshold))
-    threshold = 2
+  if (is.null(threshold))
+    threshold <-  0.01 * median(unlist(output.data[-(1:1)]))
   output.data[output.data < threshold] <- 0
   
-  
-  #Ustawienie separatora i znaku dziesietnego i Export
+  #Ustawienie separatora i znaku dziesietnego i Export------------------------------------------------
   output.data <- output.data[,!(colnames(output.data) %in% variables.colnames)]
-  # output.data <- format(output.data, decimal.mark=dec, scientific=FALSE)
+  output.data <- format(output.data, decimal.mark=dec)
   write.table(output.data, file="output.csv", sep=sep, row.names=FALSE)
-  as.numeric(sub(".", dec, output.data[-(1:1)], fixed=TRUE))
   return(output.data)
-  
 }
-
-#koniec--------------------------------------------------------------------------------------------------------
 
 
 main.tab <- read.csv2("D:\\R_data\\R_dev_task_project\\R_dev_task\\R_dev_task.csv")
 c.points <- c("2017-02-06","2017-04-30")
-result <- Modifier(input.data=main.tab, threshold=1, dates.column.name="Datyy", dec=",", sep="/")
+result <- Modifier(input.data=main.tab, min=0, max=50, step=25, threshold=0.8, cut.points=c.points, dates.column.name="Daty", dec=",", sep="/")
+
+
+
 
 debug(Modifier)
-Modifier(input.data=main.tab, threshold=1 , dates.column.name="Datyy",  cut.points=c.points, dec=",", sep="/")
+Modifier(input.data=main.tab, dates.column.name="Datyy", dec=",", sep="/")
 undebug(Modifier)
 
 
@@ -86,3 +84,13 @@ as.numeric(result[-(1:1)])
 
 is.list(result$KN00_XXX_30)
 is.character(result$KN00_XXX_30)
+
+result
+
+a = sub(".", dec, result[-(1:1)], fixed=TRUE)
+as.numeric(a)
+kol1 <- c(50, 50, 50) 
+kol2 <- c(1, 1, 1)
+kol3 <- c(100, 100, 100)
+df <- data.frame(kol1, kol2, kol3)
+apply(df, 2, FUN= median)
